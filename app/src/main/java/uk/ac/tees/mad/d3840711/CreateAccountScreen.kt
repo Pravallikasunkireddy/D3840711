@@ -1,6 +1,8 @@
 package uk.ac.tees.mad.d3840711
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +29,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
 class CreateAccountScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,7 +156,31 @@ class CreateAccountScreen : ComponentActivity() {
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(
                     onClick = {
-                        // Implement the sign-up logic here
+                        if(emailState.value.text.isNotEmpty() && passwordState.value.text.isNotEmpty() && emergencyMessageState.value.text.isNotEmpty()  && emergencyNumberState.value.text.isNotEmpty() && emailState.value.text.isNotEmpty()){
+                            FirebaseAuth
+                                .getInstance()
+                                .createUserWithEmailAndPassword(emailState.value.text, passwordState.value.text)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        CreateUserDetailsInFirebase(nameState.value.text,emailState.value.text, emergencyNumberState.value.text,emergencyMessageState.value.text)
+                                        val intent = Intent(this@CreateAccountScreen, SOSActivity::class.java)
+                                        startActivity(intent)
+                                        finish()
+                                    } else {
+                                        // Login failed, get the error message
+                                        val errorMessage = task.exception?.message
+                                        if (errorMessage != null) {
+                                            Toast.makeText(this@CreateAccountScreen, errorMessage, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }.addOnFailureListener { exception ->
+                                    Toast.makeText(this@CreateAccountScreen, exception.toString(), Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                        }else{
+                            Toast.makeText(this@CreateAccountScreen, "No feild Can be Empty", Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -159,12 +188,43 @@ class CreateAccountScreen : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(onClick = {
-                    // Implement navigation to the login screen here
+                    val intent = Intent(this@CreateAccountScreen, LoginScreenActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 }) {
                     Text("Already have an account? Log In", color = Color.White)
                 }
             }
         }
     }
+
+    private fun CreateUserDetailsInFirebase(name2:String,email:String,emergencyPhone:String,emergencyMessage:String){
+        var user = FirebaseAuth.getInstance().getCurrentUser()
+        if (user != null) {
+            val uid = user.uid
+
+            val userDoc = SheModel(
+                name2,
+                email,
+                emergencyPhone,
+                emergencyMessage,
+                "https://firebasestorage.googleapis.com/v0/b/shesafe-1789e.appspot.com/o/profile%20(2).jpg?alt=media&token=d4324620-120e-4430-a416-23022a2e0049",
+                0.0,
+                0.0
+            )
+            FirebaseFirestore.getInstance().collection("superwomen").document(uid).set(userDoc).addOnCompleteListener {
+                    task ->
+                if (task.isSuccessful) {
+
+                }else{
+                    val errorMessage = task.exception?.message
+                    if (errorMessage != null) {
+                        Toast.makeText(this@CreateAccountScreen, errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
 }
 

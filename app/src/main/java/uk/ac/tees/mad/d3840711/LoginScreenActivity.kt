@@ -12,7 +12,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import uk.ac.tees.mad.d3840711.ui.theme.SheSafeTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -148,6 +147,7 @@ class LoginScreenActivity : ComponentActivity() {
                 TextButton(onClick = {
                     val intent = Intent(this@LoginScreenActivity, CreateAccountScreen::class.java)
                     startActivity(intent)
+                    finish()
                 }) {
                     Text("Don't have an account? Sign Up", color = Color.White)
                 }

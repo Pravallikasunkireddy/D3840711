@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 
 class welcomeScreen: Fragment(R.layout.first_screen) {
 
@@ -34,21 +35,27 @@ class welcomeScreen: Fragment(R.layout.first_screen) {
                     } catch (e: Exception) {
                     } finally {
 
-//                        if (isUserLoggedIn()) {
-//                            val intent = Intent(requireContext(), HomeActivity2::class.java)
-//                            startActivity(intent)
-//                            activity?.finish()
-//                        } else {
-                            val intent = Intent(requireContext(), CreateAccountScreen::class.java)
+                        if (isUserLoggedIn()) {
+                            val intent = Intent(requireContext(), SOSActivity::class.java)
                             startActivity(intent)
                             activity?.finish()
-//                        }
+                        } else {
+                            val intent = Intent(requireContext(), LoginScreenActivity::class.java)
+                            startActivity(intent)
+                            activity?.finish()
+                        }
 
                     }
                 }
             }.start()
         }
     }
+
+    fun isUserLoggedIn(): Boolean {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        return currentUser != null
+    }
+
 
     @Composable
     fun WelcomeScreen() {
