@@ -39,9 +39,9 @@ class welcomeScreen: Fragment(R.layout.first_screen) {
 //                            startActivity(intent)
 //                            activity?.finish()
 //                        } else {
-//                            val intent = Intent(requireContext(), AuthenticationScreenActivity::class.java)
-//                            startActivity(intent)
-//                            activity?.finish()
+                            val intent = Intent(requireContext(), CreateAccountScreen::class.java)
+                            startActivity(intent)
+                            activity?.finish()
 //                        }
 
                     }
@@ -50,34 +50,43 @@ class welcomeScreen: Fragment(R.layout.first_screen) {
         }
     }
 
-
     @Composable
     fun WelcomeScreen() {
-        // Replace Color.Magenta with the color that matches your logo's background
-        val backgroundColor = Color.Magenta
+        // Create a radial gradient
+        val gradient = Brush.radialGradient(
+            colors = listOf(
+                Color(0xFF6200EE), // Deep purple
+                Color(0xFFB388FF)  // Lighter purple shade
+            ),
+        )
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = backgroundColor),
+                .background(brush = gradient),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.safe), // Replace with your logo resource ID
-                contentDescription = "Logo",
-                modifier = Modifier.align(Alignment.Center)
-            )
-            Text(
-                text = "She Safe", // Replace with your splash screen text
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White, // Replace with the color that complements your logo
-                modifier = Modifier.align(Alignment.Center)
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.safe), // Ensure this is the correct ID
+                    contentDescription = "Logo",
+                    modifier = Modifier
+                        .size(180.dp) // Adjusted size for better visibility
+                        .padding(bottom = 20.dp), // Added padding to separate from text
+                    contentScale = ContentScale.Fit
+                )
+                Text(
+                    text = "She Safe", // App name displayed as part of the splash screen
+                    fontSize = 28.sp, // Slightly larger for emphasis
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
     }
-
-
 
 
 }

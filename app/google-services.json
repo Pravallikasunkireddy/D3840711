@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "811040652356",
+    "firebase_url": "https://shesafe-1789e-default-rtdb.firebaseio.com",
+    "project_id": "shesafe-1789e",
+    "storage_bucket": "shesafe-1789e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811040652356:android:3fe666a3f708f880381011",
+        "android_client_info": {
+          "package_name": "uk.ac.tees.mad.d3840711"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ9Kao7KSXljDjrKtSzVzm6SUa6UnDRVQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
