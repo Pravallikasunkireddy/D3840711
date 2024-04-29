@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,6 +16,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SheSafe"
         tools:targetApi="31">
+        <activity
+            android:name=".ManageProfile"
+            android:exported="false"
+            android:label="@string/title_activity_manage_profile"
+            android:theme="@style/Theme.SheSafe" />
+        <activity
+            android:name=".EditProfileScreen"
+            android:exported="false"
+            android:label="@string/title_activity_edit_profile_screen"
+            android:theme="@style/Theme.SheSafe" />
         <activity
             android:name=".SOSActivity"
             android:exported="false"

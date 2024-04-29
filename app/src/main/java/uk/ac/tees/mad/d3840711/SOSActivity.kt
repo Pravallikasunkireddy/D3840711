@@ -2,6 +2,7 @@ package uk.ac.tees.mad.d3840711
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
@@ -35,6 +36,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberImagePainter
@@ -179,7 +181,7 @@ class SOSActivity : ComponentActivity() {
 
 
             composable(NavigationClass.Account.route) {
-                UserProfileScreen()
+                UserProfileScreen(this@SOSActivity)
             }
 
         }
@@ -187,13 +189,14 @@ class SOSActivity : ComponentActivity() {
 
 
     @Composable
-    fun UserProfileScreen() {
+    fun UserProfileScreen(context: Context) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         var loading by remember { mutableStateOf(true)}
 
 
         val scrollState = rememberScrollState()
+        val localContext = LocalContext.current
 
         var sheWomen by remember { mutableStateOf(SheModel(
             "super women",
@@ -332,7 +335,8 @@ class SOSActivity : ComponentActivity() {
 
                     Button(
                         onClick = {
-                            // Navigate to Edit Profile screen
+                            val intent = Intent(context, ManageProfile::class.java)
+                            localContext.startActivity(intent)
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
