@@ -1,6 +1,7 @@
 package uk.ac.tees.mad.d3840711
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -347,7 +348,10 @@ class SOSActivity : ComponentActivity() {
 
                     Button(
                         onClick = {
-                                  // Navigate to login screen
+                            FirebaseAuth.getInstance().signOut()
+                            val intent = Intent(context, LoginScreenActivity::class.java)
+                            localContext.startActivity(intent)
+                            (context as? Activity)?.finish()
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -416,7 +420,7 @@ class SOSActivity : ComponentActivity() {
                 contentAlignment = Alignment.Center
             ) {
                 Button(
-                    onClick = { sendSMS(sheWomen.emergencyPhone,sheWomen.emergencyMessage)},
+                    onClick = { sendSMS(sheWomen.emergencyPhone,sheWomen.emergencyMessage+"\n Location :  Latitiude - "+sheWomen.lat.toString()+" \n Longitude - "+sheWomen.long.toString())},
                     modifier = Modifier
                         .size(150.dp) // Adjust size as necessary
                         .padding(16.dp)
