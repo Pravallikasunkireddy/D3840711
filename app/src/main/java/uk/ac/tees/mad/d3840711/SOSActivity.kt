@@ -33,13 +33,17 @@ import uk.ac.tees.mad.d3840711.ui.theme.SheSafeTheme
 import android.telephony.SmsManager
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.rememberImagePainter
 
 class SOSActivity : ComponentActivity() {
@@ -125,6 +129,7 @@ class SOSActivity : ComponentActivity() {
 
         val items = listOf(
             NavigationClass.Home,
+            NavigationClass.Articles,
             NavigationClass.Account
         )
 
@@ -179,12 +184,128 @@ class SOSActivity : ComponentActivity() {
             composable(NavigationClass.Home.route) {
                 SOSScreen(this@SOSActivity,{})
             }
+            composable(NavigationClass.Articles.route) {
+                val viewModel = remember { LatestNewsViewModel() }
+                ArticleScreen(this@SOSActivity,viewModel)
+            }
 
 
             composable(NavigationClass.Account.route) {
                 UserProfileScreen(this@SOSActivity)
             }
 
+        }
+    }
+
+    @Composable
+    fun ArticleScreen(context: Context,viewModel: LatestNewsViewModel){
+
+        val data = viewModel.data.value
+        val error = viewModel.error.value
+        var articles by remember { mutableStateOf<List<TopNewsArticle>>(emptyList()) }
+
+        // Trigger API call if data is null and no error occurred
+        if (data == null && error == null) {
+            LaunchedEffect(Unit) {
+                viewModel.fetchData()
+            }
+        }
+        // Display UI based on data and error states
+        when {
+            data != null -> {
+                articles = data.articles
+                // Display fetched data
+                // Example: Display a list of news articles
+            }
+            error != null -> {
+                println(error)
+                // Display error message
+                // Example: Display a snackbar with the error message
+            }
+            else -> {
+                // Display loading indicator
+                // Example: Display a progress indicator
+            }
+        }
+        val backgroundGradient = Brush.radialGradient(
+            colors = listOf(Color(0xFFB388FF), Color(0xFFB388FF)) // Using the same color for a subtle effect
+        )
+
+        LazyColumn(
+            modifier = Modifier
+                .background(backgroundGradient)
+                .fillMaxSize()
+
+        ) {
+            items(articles) { cartItem ->
+                HorizontalCard(article = cartItem,context)
+            }
+
+            // Add some spacing between the LazyColumn and the TotalAmountButton
+            item {
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+        }
+
+    }
+
+    @Composable
+    fun HorizontalCard(article: TopNewsArticle, context: Context) {
+        val localContext = LocalContext.current
+        Card(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp) // Increased padding for better aesthetics
+                .fillMaxWidth()
+                .clickable {
+                    val intent = Intent(context, ArticleScreen::class.java).apply {
+                        putExtra("image_url", article.urlToImage)
+                        putExtra("title", article.title)
+                        putExtra("url", article.url)
+                        putExtra("content", article.content)
+                    }
+                    localContext.startActivity(intent)
+                },
+            elevation = 4.dp, // Reduced elevation for a subtler shadow
+            shape = RoundedCornerShape(12.dp), // Increased rounding for a softer look
+            backgroundColor = Color.White,
+            contentColor = Color.Black
+        ) {
+            Row(
+                modifier = Modifier.padding(all = 16.dp), // More padding inside for a spacious look
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = rememberImagePainter(
+                        data = article.urlToImage,
+                        builder = {
+                            crossfade(true)// Assuming you have a drawable placeholder
+                        }
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(100.dp) // Increased size for the image
+                        .clip(RoundedCornerShape(12.dp)) // Consistent rounding with the card
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(
+                    modifier = Modifier.weight(1f) // Takes up all available space after the image
+                ) {
+                    Text(
+                        text = article.title,
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        maxLines = 2, // Ensures text doesn't overflow in smaller devices
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = article.publishedAt, // Assume formatted date string
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         }
     }
 
