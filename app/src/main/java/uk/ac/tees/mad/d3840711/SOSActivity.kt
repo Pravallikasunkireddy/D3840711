@@ -8,11 +8,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +29,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import uk.ac.tees.mad.d3840711.ui.theme.SheSafeTheme
 import android.telephony.SmsManager
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import coil.compose.rememberImagePainter
 
 class SOSActivity : ComponentActivity() {
 
@@ -176,13 +179,180 @@ class SOSActivity : ComponentActivity() {
 
 
             composable(NavigationClass.Account.route) {
-
+                UserProfileScreen()
             }
 
         }
     }
 
 
+    @Composable
+    fun UserProfileScreen() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        var loading by remember { mutableStateOf(true)}
+
+
+        val scrollState = rememberScrollState()
+
+        var sheWomen by remember { mutableStateOf(SheModel(
+            "super women",
+            "sumper.women@example.com",
+            "1234567890",
+            "No message" ,
+            "https://firebasestorage.googleapis.com/v0/b/shesafe-1789e.appspot.com/o/profile%20(2).jpg?alt=media&token=d4324620-120e-4430-a416-23022a2e0049",
+            0.0,
+            0.0
+        )) }
+        LaunchedEffect(uid) {
+            if(uid != null) {
+                FirebaseFirestore.getInstance().collection("superwomen").document(uid).get()
+                    .addOnSuccessListener { document ->
+                        if (document.exists()) {
+                            val sheData = document.toObject(SheModel::class.java)
+                            if (sheData != null) {
+                                sheWomen = sheData
+                                loading = false
+                            }
+                        }
+                    }
+            }
+        }
+
+        if(loading){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFFB388FF), Color(0xFFB388FF))
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    strokeWidth = 4.dp,
+                    color = Color.Blue, // Change the color as needed
+                    modifier = Modifier.size(50.dp) // Change the size as needed
+                )
+            }
+        }
+        else{
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFFB388FF), Color(0xFFB388FF))
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .verticalScroll(scrollState)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Image(
+                        painter = rememberImagePainter(sheWomen.image_url),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, Color.Red, CircleShape),
+                        contentScale = ContentScale.Crop
+
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Name:",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = sheWomen.name,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Email:",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = sheWomen.email,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Emergency Phone:",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = sheWomen.emergencyPhone,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Emergency Message:",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = sheWomen.emergencyMessage,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = {
+                            // Navigate to Edit Profile screen
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Edit Profile")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = {
+                                  // Navigate to login screen
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Logout")
+                    }
+                }
+            }
+        }
+    }
 
     @Composable
     fun SOSScreen(context: Context,onSOSClicked: () -> Unit) {
